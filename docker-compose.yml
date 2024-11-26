@@ -1,5 +1,5 @@
+name: "local-environment"
 services:
-
   traefik:
     container_name: "local.traefik"
     hostname: "local.traefik"
