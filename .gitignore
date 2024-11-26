@@ -1,0 +1,8 @@
+.idea
+.env
+mysql/data/*
+mysql/bridge/*
+postgres/data/*
+postgres/bridge/*
+redis/data/*
+redis/bridge/*
