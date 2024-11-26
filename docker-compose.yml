@@ -4,7 +4,7 @@ services:
     container_name: "local.traefik"
     hostname: "local.traefik"
     image: traefik:3.2.1
-    restart: on-failure
+    restart: unless-stopped
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
@@ -21,7 +21,7 @@ services:
     container_name: "local.redis"
     hostname: "local.redis"
     image: redis:7.4.1
-    restart: on-failure
+    restart: unless-stopped
     environment:
       - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD}
     ports:
@@ -37,7 +37,7 @@ services:
     container_name: "local.mysql"
     hostname: "local.mysql"
     image: mysql:9.1
-    restart: on-failure
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -56,7 +56,7 @@ services:
     container_name: "local.postgres"
     hostname: "local.postgres"
     image: postgres:17.2
-    restart: on-failure
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -74,7 +74,7 @@ services:
     container_name: "local.adminer"
     hostname: "local.adminer"
     image: adminer:4.8.1
-    restart: on-failure
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.adminer.rule=Host(`adminer.loc`)"
