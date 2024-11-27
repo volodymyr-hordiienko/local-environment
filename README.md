@@ -7,6 +7,7 @@ Add the following to your `/etc/hosts` file:
 ```bash
 # Docker local environment
 127.0.0.1       adminer.local
+127.0.0.1       mailpit.local
 ```
 
 Run `docker-compose up -d` to start the containers
@@ -15,6 +16,8 @@ You can pass any files you want to run in the containers by adding them to the `
 
 You can access the following services:
 - Adminer: [http://adminer.local](http://adminer.local)
+- MailPit: [http://mailpit.local](http://mailpit.local)
+- MailPit SMTP: `localhost:1025`
 - Postgres: `localhost:5432`
 - Mysql: `localhost:3306`
 - Redis: `localhost:6379`

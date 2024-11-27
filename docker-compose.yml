@@ -83,6 +83,21 @@ services:
       local-network:
         ipv4_address: 42.89.0.6
 
+  mailpit:
+    container_name: "local.mailpit"
+    hostname: "local.mailpit"
+    image: axllent/mailpit:v1.21.5
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailpit.rule=Host(`mailpit.local`)"
+      - "traefik.http.services.mailpit.loadbalancer.server.port=8025"
+    networks:
+      local-network:
+        ipv4_address: 42.89.0.7
+
 networks:
   local-network:
     driver: bridge
