@@ -77,7 +77,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.adminer.rule=Host(`adminer.loc`)"
+      - "traefik.http.routers.adminer.rule=Host(`adminer.local`)"
       - "traefik.http.services.adminer.loadbalancer.server.port=8080"
     networks:
       local-network:
