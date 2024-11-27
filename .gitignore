@@ -6,3 +6,5 @@ postgres/data/*
 postgres/bridge/*
 redis/data/*
 redis/bridge/*
+minio/data/*
+minio/bridge/*
