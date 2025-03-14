@@ -8,3 +8,5 @@ redis/data/*
 redis/bridge/*
 minio/data/*
 minio/bridge/*
+sonarqube/data/*
+sonarqube/logs/*

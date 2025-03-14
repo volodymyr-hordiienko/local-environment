@@ -118,6 +118,32 @@ services:
     networks:
       local-network:
         ipv4_address: 42.89.0.8
+
+  sonarqube:
+    container_name: "local.sonarqube"
+    hostname: "local.sonarqube"
+    image: sonarqube:latest
+    restart: unless-stopped
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://local.postgres:5432/${SONARQUBE_JDBC_DATABASE}
+      SONAR_JDBC_USERNAME: ${POSTGRES_USER}
+      SONAR_JDBC_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - postgres
+    volumes:
+      - ./sonarqube/data:/opt/sonarqube/data
+      - ./sonarqube/extensions:/opt/sonarqube/extensions
+      - ./sonarqube/logs:/opt/sonarqube/logs
+    ports:
+      - "9090:9000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sonarqube.rule=Host(`sonarqube.local`)"
+      - "traefik.http.services.sonarqube.loadbalancer.server.port=9000"
+    networks:
+      local-network:
+        ipv4_address: 42.89.0.9
+
 networks:
   local-network:
     driver: bridge
