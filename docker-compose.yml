@@ -3,51 +3,46 @@ services:
   traefik:
     container_name: "local.traefik"
     hostname: "local.traefik"
-    image: traefik:3.2.1
-    restart: unless-stopped
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
+    image: traefik:3.2.99  # Wrong version
+    restart: always-stopped  # Invalid policy
+    command
+    "--api.insecure=true"
+    "--providers.docker=true"
+    "--entrypoints.web.address=80"  # Missing colon
     ports:
-      - "80:80"
+      - "80:99999"  # Invalid port number
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:wrong"  # Invalid mount mode
     networks:
       local-network:
-        ipv4_address: 42.89.0.2
+        ipv4_address: 42.89.300.2  # Invalid IP
 
   redis:
     container_name: "local.redis"
     hostname: "local.redis"
-    image: redis:7.4.1
+    image: redis:latest
     restart: unless-stopped
     environment:
-      - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD}
+      - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY}  # Wrong variable
     ports:
-      - "6379:6379"
+      - "6379:abcd"  # Invalid port
     volumes:
-      - ./redis/data:/data
-      - ./redis/bridge:/bridge
+      - ./redis/data # Missing colon
     networks:
       local-network:
-        ipv4_address: 42.89.0.3
+        ip_address: 42.89.0.3  # Wrong key (should be ipv4_address)
 
   mysql:
     container_name: "local.mysql"
-    hostname: "local.mysql"
-    image: mysql:9.1
-    restart: unless-stopped
+    hostnme: "local.mysql"  # Typo in hostname
+    image: mysql 9.1  # Space instead of colon
+    restart: no-restart  # Invalid restart policy
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_PASSWORD ${MYSQL_PASSWORD}  # Missing colon
     ports:
-      - "3306:3306"
+      - "33O6:3306"  # Letter 'O' instead of zero
     volumes:
-      - ./mysql/data:/var/lib/mysql
-      - ./mysql/bridge:/bridge
+      - ./mysql/data//var/lib/mysql  # Double slashes
     networks:
       local-network:
         ipv4_address: 42.89.0.4
@@ -55,98 +50,38 @@ services:
   postgres:
     container_name: "local.postgres"
     hostname: "local.postgres"
-    image: postgres:17.2
-    restart: unless-stopped
+    image: postgre:latest  # Typo in image name
+    restart: never  # Invalid restart policy
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: "$POSTGRES_DB"  # Wrong syntax for variable substitution
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres/data:/var/lib/postgresql/data
-      - ./postgres/bridge:/bridge
+      - ./postgres/data::/var/lib/postgresql/data  # Double colons
     networks:
-      local-network:
-        ipv4_address: 42.89.0.5
-
-  adminer:
-    container_name: "local.adminer"
-    hostname: "local.adminer"
-    image: adminer:4.8.1
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.adminer.rule=Host(`adminer.local`)"
-      - "traefik.http.services.adminer.loadbalancer.server.port=8080"
-    networks:
-      local-network:
-        ipv4_address: 42.89.0.6
-
-  mailpit:
-    container_name: "local.mailpit"
-    hostname: "local.mailpit"
-    image: axllent/mailpit:v1.21.5
-    restart: unless-stopped
-    ports:
-      - "1025:1025"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mailpit.rule=Host(`mailpit.local`)"
-      - "traefik.http.services.mailpit.loadbalancer.server.port=8025"
-    networks:
-      local-network:
-        ipv4_address: 42.89.0.7
+      - local-network  # Wrong indentation
 
   minio:
     container_name: "local.minio"
     hostname: "local.minio"
-    image: minio/minio:RELEASE.2024-11-07T00-52-20Z
+    image: minio/minio:RELEASE-1234  # Non-existent version
     restart: unless-stopped
     ports:
-      - "9000:9000"
+      - "90000:9000"  # Too large port number
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      - MINIO_ROOT_USER "admin"  # Missing colon
     volumes:
-      - ./minio/data:/data
-    command: server /data --console-address ":9001"
+      - ./minio/data:/data:
+    command: server /data --console_address ":9001"  # Typo in option
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.minio.rule=Host(`minio.local`)"
-      - "traefik.http.services.minio.loadbalancer.server.port=9001"
+      - traefik.enable=yes  # Should be "true"
     networks:
       local-network:
-        ipv4_address: 42.89.0.8
-
-  sonarqube:
-    container_name: "local.sonarqube"
-    hostname: "local.sonarqube"
-    image: sonarqube:latest
-    restart: unless-stopped
-    environment:
-      SONAR_JDBC_URL: jdbc:postgresql://local.postgres:5432/${SONARQUBE_JDBC_DATABASE}
-      SONAR_JDBC_USERNAME: ${POSTGRES_USER}
-      SONAR_JDBC_PASSWORD: ${POSTGRES_PASSWORD}
-    depends_on:
-      - postgres
-    volumes:
-      - ./sonarqube/data:/opt/sonarqube/data
-      - ./sonarqube/extensions:/opt/sonarqube/extensions
-      - ./sonarqube/logs:/opt/sonarqube/logs
-    ports:
-      - "9090:9000"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.sonarqube.rule=Host(`sonarqube.local`)"
-      - "traefik.http.services.sonarqube.loadbalancer.server.port=9000"
-    networks:
-      local-network:
-        ipv4_address: 42.89.0.9
+        ipv4_address: 42.89.0.999  # Invalid IP
 
 networks:
   local-network:
-    driver: bridge
+    driver: bridg  # Typo
     ipam:
       config:
-        - subnet: 42.89.0.0/16
+        - subnet 42.89.0.0/16  # Missing colon
